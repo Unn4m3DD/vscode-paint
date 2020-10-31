@@ -20,16 +20,21 @@ export function activate(context: vscode.ExtensionContext) {
     let view = vscode.window.createWebviewPanel("vscode paint", "asd", vscode.ViewColumn.One, {
       enableScripts: true,
     });
-    const onDiskPath = vscode.Uri.file(
-      path.join(context.extensionPath, 'out', 'script.js')
-    );
-    view.webview.html = getWebviewContent(onDiskPath.fsPath);
+    view.webview.html = getWebviewContent([
+      vscode.Uri.file(path.join(context.extensionPath, 'out', 'setup.js')).fsPath,
+      vscode.Uri.file(path.join(context.extensionPath, 'out', 'button.js')).fsPath,
+      vscode.Uri.file(path.join(context.extensionPath, 'out', 'script.js')).fsPath
+    ]);
     vscode.window.showInformationMessage('Hello World from vscode-paint!');
   });
 
   context.subscriptions.push(disposable);
 }
-function getWebviewContent(uri: string) {
+function getWebviewContent(uris: string[]) {
+  let js = "";
+  for (let uri of uris) {
+    js += "\n" + fs.readFileSync(uri).toString();
+  }
   return `<!DOCTYPE html>
 <html lang="en" style="width: 100%; height: 100%; margin: 0px;">
 <head>
@@ -38,11 +43,10 @@ function getWebviewContent(uri: string) {
     <title>Cat Coding</title>
 </head>
 <body style="width: 100%; height: 100%; margin: 0px;" id="body">
-  <canvas id="canvas" style="width: 100%; height: 100%; margin: 0px; display:block;" 
-    width="1600" height="900"
+  <canvas id="canvas" style="margin: 0px; display:block;" 
   ></canvas>
 </body>
-<script> ${fs.readFileSync(uri).toString()} </script>
+<script> ${js} </script>
 </html>`;
 }
 // this method is called when your extension is deactivated

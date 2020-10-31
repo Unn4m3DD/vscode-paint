@@ -1,20 +1,24 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es6",
+    "target": "es2015",
+    "module": "es2015",
     "outDir": "../out",
     "lib": [
       "DOM"
     ],
     "sourceMap": true,
     "strict": true, /* enable all strict type-checking options */
+    "noImplicitAny": true,
     /* Additional Checks */
     "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
     // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
     "noUnusedParameters": true /* Report errors on unused parameters. */
   },
   "files": [
-    "script.ts"
+    "script.ts",
+    "button.ts",
+    "setup.ts",
+    ".d.ts"
   ],
   "exclude": [
     "node_modules",
