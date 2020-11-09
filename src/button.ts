@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 class Button {
   inner_render: () => void;
-  constructor(inner_render: () => void) {
+  onclick: () => void;
+  constructor(inner_render: () => void, onclick: () => void) {
     this.inner_render = inner_render;
+    this.onclick = onclick;
   }
   mouse_inside_bound() {
     const top_left = get_global_position({ x: -25, y: -25 });
@@ -12,8 +14,10 @@ class Button {
   }
   render() {
     if (this.mouse_inside_bound()) {
-      if (mouse.down)
+      if (mouse.down) {
+        this.onclick();
         ctx.fillStyle = "#111";
+      }
       else
         ctx.fillStyle = "#444";
     }
