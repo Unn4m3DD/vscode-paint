@@ -77,21 +77,25 @@ class ColorPicker {
   mouse_inside_bound() {
     const top_left = get_global_position({ x: 0, y: 0 });
     const bottom_right = get_global_position({ x: 120, y: 80 });
-    console.log(top_left.x, top_left.y, bottom_right.x - top_left.x, bottom_right.y - top_left.y);
     return (top_left.x < mouse.x && mouse.x < bottom_right.x &&
       top_left.y < mouse.y && mouse.y < bottom_right.y);
   }
   render() {
-    if (this.mouse_inside_bound()) {
-      let { x, y } = get_global_position({ x: color_slider.current_x - 14, y: 2 });
-      let color = ctx.getImageData(x, y, 1, 1).data;
-      tool.fill_color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1)`;
-    }
     this.quad_gradient(0, 0, 120, 80, {
       topLeft: [1, 1, 1, 1],
       topRight: tool.base_color,
       bottomLeft: [0, 0, 0, 1],
       bottomRight: [0, 0, 0, 1]
     });
+
+    if (this.mouse_inside_bound()) {
+      if (mouse.down) {
+        let { x, y } = ({ x: mouse.x - 20, y: mouse.y });
+        let color = ctx.getImageData(x, y, 1, 1).data;
+        console.log({ x, y, color })
+        tool.fill_color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1)`;
+        tool.stroke_color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1)`;
+      }
+    }
   }
 }
