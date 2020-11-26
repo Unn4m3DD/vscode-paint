@@ -35,7 +35,7 @@ let buttons = [
     ctx.lineTo(10, 12);
     ctx.closePath();
     ctx.stroke();
-  }, () => { }),
+  }, () => { tool.name = "line"; }),
   new Button(() => {
     ctx.drawImage(bucket, 0, 0, bucket.width, bucket.height, -16, -16, 35, 35);
   }, () => { }),
@@ -163,6 +163,29 @@ function tools() {
       0, 0, 2 * Math.PI);
     drawing_ctx.closePath();
     drawing_ctx.fill();
+    tool.start_pos = null;
+  }
+
+
+  if (tool.name === "line" && mouse.down) {
+    if (tool.start_pos !== null) {
+      ctx.fillStyle = tool.fill_color;
+      ctx.beginPath();
+      ctx.moveTo(tool.start_pos.x - 20, tool.start_pos.y);
+      ctx.lineTo(mouse.x - 20, mouse.y);
+      ctx.closePath();
+      ctx.stroke();
+    } else {
+      tool.start_pos = { x: mouse.x, y: mouse.y };
+    }
+  }
+  if (tool.name === "line" && !mouse.down && tool.start_pos !== null) {
+    drawing_ctx.fillStyle = tool.fill_color;
+    drawing_ctx.beginPath();
+    drawing_ctx.moveTo(tool.start_pos.x - 20, tool.start_pos.y);
+    drawing_ctx.lineTo(mouse.x - 20, mouse.y);
+    drawing_ctx.closePath();
+    drawing_ctx.stroke();
     tool.start_pos = null;
   }
 }
