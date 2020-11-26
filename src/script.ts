@@ -19,7 +19,7 @@ let buttons = [
     ctx.arc(0, 0, 13, 0, Math.PI * 2);
     ctx.closePath();
     ctx.stroke();
-  }, () => { }),
+  }, () => { tool.name = "elipse"; }),
   new Button(() => {
     ctx.drawImage(brush, 0, 0, brush.width, brush.height, -16, -16, 35, 35);
   }, () => { tool.name = "brush"; }),
@@ -116,23 +116,7 @@ let color_slider = new Slider(() => {
   ctx.strokeStyle = old_stroke;
 });
 
-
-let color_picker = new ColorPicker();
-const render = () => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  translate(20, 50);
-  for (let i = 0; i < buttons.length / 2; i++) {
-    translate(50, 50 * i);
-    buttons[2 * i].render();
-    translate(-50, -50 * i);
-    if (buttons[2 * i + 1]) {
-      translate(50 + 50, 50 * i);
-      buttons[2 * i + 1].render();
-      translate(-50 - 50, -50 * i);
-    }
-  }
-  translate(-20, -50);
-
+function tools() {
   if (tool.name === "rectangle" && mouse.down) {
     if (tool.start_pos !== null) {
       ctx.fillStyle = tool.fill_color;
@@ -152,6 +136,53 @@ const render = () => {
     );
     tool.start_pos = null;
   }
+
+
+  if (tool.name === "elipse" && mouse.down) {
+    if (tool.start_pos !== null) {
+      ctx.fillStyle = tool.fill_color;
+      ctx.beginPath();
+      ctx.ellipse(
+        tool.start_pos.x + (mouse.x - 20 - tool.start_pos.x) / 2,
+        tool.start_pos.y + (mouse.y - tool.start_pos.y) / 2,
+        Math.abs(mouse.x - tool.start_pos.x) / 2, Math.abs(mouse.y - tool.start_pos.y) / 2,
+        0, 0, 2 * Math.PI);
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      tool.start_pos = { x: mouse.x, y: mouse.y };
+    }
+  }
+  if (tool.name === "elipse" && !mouse.down && tool.start_pos !== null) {
+    drawing_ctx.fillStyle = tool.fill_color;
+    drawing_ctx.beginPath();
+    drawing_ctx.ellipse(
+      tool.start_pos.x + (mouse.x - 20 - tool.start_pos.x) / 2,
+      tool.start_pos.y + (mouse.y - tool.start_pos.y) / 2,
+      Math.abs(mouse.x - tool.start_pos.x) / 2, Math.abs(mouse.y - tool.start_pos.y) / 2,
+      0, 0, 2 * Math.PI);
+    drawing_ctx.closePath();
+    drawing_ctx.fill();
+    tool.start_pos = null;
+  }
+}
+
+let color_picker = new ColorPicker();
+const render = () => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  translate(20, 50);
+  for (let i = 0; i < buttons.length / 2; i++) {
+    translate(50, 50 * i);
+    buttons[2 * i].render();
+    translate(-50, -50 * i);
+    if (buttons[2 * i + 1]) {
+      translate(50 + 50, 50 * i);
+      buttons[2 * i + 1].render();
+      translate(-50 - 50, -50 * i);
+    }
+  }
+  translate(-20, -50);
+  tools();
   translate(40, 350);
   brush_size_slider.render();
   translate(-40, -350);
