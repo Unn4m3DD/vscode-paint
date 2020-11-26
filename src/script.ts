@@ -117,6 +117,7 @@ let color_slider = new Slider(() => {
 });
 
 function tools() {
+  let old_stroke = ctx.strokeStyle;
   if (tool.name === "rectangle" && mouse.down) {
     if (tool.start_pos !== null) {
       ctx.fillStyle = tool.fill_color;
@@ -169,7 +170,7 @@ function tools() {
 
   if (tool.name === "line" && mouse.down) {
     if (tool.start_pos !== null) {
-      ctx.fillStyle = tool.fill_color;
+      ctx.strokeStyle = tool.fill_color;
       ctx.beginPath();
       ctx.moveTo(tool.start_pos.x - 20, tool.start_pos.y);
       ctx.lineTo(mouse.x - 20, mouse.y);
@@ -180,7 +181,7 @@ function tools() {
     }
   }
   if (tool.name === "line" && !mouse.down && tool.start_pos !== null) {
-    drawing_ctx.fillStyle = tool.fill_color;
+    drawing_ctx.strokeStyle = tool.fill_color;
     drawing_ctx.beginPath();
     drawing_ctx.moveTo(tool.start_pos.x - 20, tool.start_pos.y);
     drawing_ctx.lineTo(mouse.x - 20, mouse.y);
@@ -188,6 +189,8 @@ function tools() {
     drawing_ctx.stroke();
     tool.start_pos = null;
   }
+
+  ctx.strokeStyle = old_stroke;
 }
 
 let color_picker = new ColorPicker();

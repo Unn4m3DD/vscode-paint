@@ -3,8 +3,8 @@ import * as path from 'path';
 import * as fs from "fs";
 export function activate(context: vscode.ExtensionContext) {
 
-  let disposable = vscode.commands.registerCommand('vscode-paint.helloWorld', () => {
-    let view = vscode.window.createWebviewPanel("vscode paint", "asd", vscode.ViewColumn.One, {
+  let disposable = vscode.commands.registerCommand('vscode-paint.open', () => {
+    let view = vscode.window.createWebviewPanel("VSCode Paint", "paint", vscode.ViewColumn.One, {
       enableScripts: true,
     });
     view.webview.html = getWebviewContent([
@@ -12,7 +12,6 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.Uri.file(path.join(context.extensionPath, 'out', 'button.js')).fsPath,
       vscode.Uri.file(path.join(context.extensionPath, 'out', 'script.js')).fsPath
     ]);
-    vscode.window.showInformationMessage('Hello World from vscode-paint!');
   });
 
   context.subscriptions.push(disposable);
