@@ -49,23 +49,6 @@ let buttons = [
   }, () => { }),
 ];
 
-const render_preview = () => {
-  ctx.save();
-  ctx.fillStyle = tool.stroke_color;
-  ctx.strokeStyle = tool.stroke_color;
-  if (tool.name === "eraser") {
-    ctx.fillStyle = "#FFF";
-    ctx.strokeStyle = "#FFF";
-  }
-  if (tool.name === "brush" || tool.name === "eraser") {
-    ctx.beginPath();
-    ctx.arc(mouse.x - 20, mouse.y, tool.stroke_size / 2, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.fill();
-  }
-  ctx.restore();
-};
-
 let brush_size_slider = new Slider(() => {
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, 120, 4);
@@ -124,12 +107,11 @@ let color_slider = new Slider(() => {
   ctx.strokeStyle = old_stroke;
 });
 
-function tools() {
-  let old_stroke = ctx.strokeStyle;
-  let old_stroke_width = ctx.lineWidth;
+function render_preview() {
+  ctx.save();
 
   if (tool.name === "eye_dropper" && mouse.down) {
-    let color = drawing_ctx.getImageData(mouse.x, mouse.y, 1, 1).data;
+    let color = drawing_ctx.getImageData(mouse.x - 20, mouse.y, 1, 1).data;
     tool.fill_color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1)`;
     tool.stroke_color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1)`;
   }
@@ -236,6 +218,7 @@ function tools() {
   if (tool.name === "line" && mouse.down) {
     if (tool.start_pos !== null) {
       ctx.strokeStyle = tool.fill_color;
+      ctx.lineWidth = tool.stroke_size - 15;
       ctx.beginPath();
       ctx.moveTo(tool.start_pos.x - 20, tool.start_pos.y);
       ctx.lineTo(mouse.x - 20, mouse.y);
@@ -247,6 +230,7 @@ function tools() {
   }
   if (tool.name === "line" && !mouse.down && tool.start_pos !== null) {
     drawing_ctx.strokeStyle = tool.fill_color;
+    drawing_ctx.lineWidth = tool.stroke_size - 15;
     drawing_ctx.beginPath();
     drawing_ctx.moveTo(tool.start_pos.x - 20, tool.start_pos.y);
     drawing_ctx.lineTo(mouse.x - 20, mouse.y);
@@ -255,14 +239,27 @@ function tools() {
     tool.start_pos = null;
   }
 
-  ctx.lineWidth = old_stroke_width;
-  ctx.strokeStyle = old_stroke;
+  ctx.fillStyle = tool.stroke_color;
+  ctx.strokeStyle = tool.stroke_color;
+  if (tool.name === "eraser") {
+    ctx.fillStyle = "#FFF";
+    ctx.strokeStyle = "#FFF";
+  }
+  if (tool.name === "brush" || tool.name === "eraser") {
+    ctx.beginPath();
+    ctx.arc(mouse.x - 20, mouse.y, tool.stroke_size / 2, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
 }
 
 let color_picker = new ColorPicker();
 const render = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  translate(20, 50);
+  ctx.fillStyle = "#666";
+  ctx.fillRect(0, 0, 160, canvas.height);
+  translate(5, 50);
   for (let i = 0; i < buttons.length / 2; i++) {
     translate(50, 50 * i);
     buttons[2 * i].render();
@@ -273,20 +270,20 @@ const render = () => {
       translate(-50 - 50, -50 * i);
     }
   }
-  translate(-20, -50);
-  tools();
-  translate(40, 350);
+  translate(-5, -50);
+
+  translate(20, 350);
   brush_size_slider.render();
-  translate(-40, -350);
-  translate(40, 400);
+  translate(-20, -350);
+  translate(20, 400);
   color_picker.render();
-  translate(-40, -400);
-  translate(40, 500);
+  translate(-20, -400);
+  translate(20, 500);
   color_slider.render();
-  translate(-40, -500);
+  translate(-20, -500);
 
-
-  render_preview();
+  if (mouse.x > 160)
+    render_preview();
   mouse.update = false;
 };
 
