@@ -9,7 +9,19 @@ let buttons = [
     ctx.setLineDash([]);
   }, () => { tool.name = "marquee"; }),
   new Button(() => {
-    ctx.drawImage(eraser, 0, 0, eraser.width, eraser.height, -18, -13, 35, 35);
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, -10);
+    ctx.lineTo(15, 0);
+    ctx.lineTo(0, 20);
+    ctx.lineTo(-12, 12);
+    ctx.lineTo(-12, 7);
+
+    ctx.lineTo(0, -10);
+
+    ctx.stroke();
+    ctx.lineWidth = 1;
   }, () => { tool.name = "eraser"; }),
   new Button(() => {
     ctx.strokeRect(-12.5, -6.5, 25, 13);
