@@ -12,5 +12,7 @@ interface Tool {
   stroke_color: string,
   stroke_size: number,
   start_pos: { x: number, y: number } | null,
+  end_pos: { x: number, y: number } | null,
+  buffered_image: ImageData,
   base_color: number[]
 }

@@ -115,6 +115,30 @@ function render_preview() {
     tool.fill_color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1)`;
     tool.stroke_color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1)`;
   }
+  if (tool.name === "marquee" && mouse.down && tool.end_pos === null) {
+    ctx.fillStyle = "#000";
+    if (tool.start_pos !== null) {
+      ctx.setLineDash([4]);
+      ctx.strokeRect(
+        tool.start_pos.x, tool.start_pos.y,
+        mouse.x - 20 - tool.start_pos.x, mouse.y - tool.start_pos.y
+      );
+      ctx.setLineDash([]);
+    } else {
+      tool.start_pos = { x: mouse.x - 20, y: mouse.y };
+    }
+  }
+  if (tool.name === "marquee" && !mouse.down && tool.start_pos !== null && tool.end_pos === null) {
+    tool.end_pos = { x: mouse.x - 20, y: mouse.y };
+    tool.buffered_image =
+      drawing_ctx.getImageData(tool.start_pos.x, tool.start_pos.y,
+        tool.end_pos.x - tool.start_pos.x, tool.end_pos.y - tool.start_pos.y);
+    ctx.putImageData(tool.buffered_image, tool.start_pos.x, tool.start_pos.y);
+
+    drawing_ctx.fillStyle = "#fff";
+    drawing_ctx.fillRect(tool.start_pos.x, tool.start_pos.y,
+      tool.end_pos.x - tool.start_pos.x, tool.end_pos.y - tool.start_pos.y);
+  }
   if (tool.name === "rectangle" && mouse.down) {
     if (tool.start_pos !== null) {
       ctx.strokeStyle = tool.fill_color;
@@ -247,12 +271,50 @@ function render_preview() {
   }
   if (tool.name === "brush" || tool.name === "eraser") {
     ctx.beginPath();
-    ctx.arc(mouse.x - 20, mouse.y, tool.stroke_size / 2, 0, Math.PI * 2);
+    ctx.arc(mouse.x, mouse.y, tool.stroke_size / 2, 0, Math.PI * 2);
     ctx.closePath();
     ctx.fill();
   }
   ctx.restore();
 }
+
+function render_marquee() {
+  let mouse_inside_marquee = () => {
+    if (tool.start_pos === null || tool.end_pos === null)
+      return false;
+    return Math.abs(tool.start_pos.x - mouse.x + 20) + Math.abs(tool.end_pos.x - mouse.x + 20)
+      === Math.abs(tool.start_pos.x - tool.end_pos.x) &&
+      Math.abs(tool.start_pos.y - mouse.y) + Math.abs(tool.end_pos.y - mouse.y)
+      === Math.abs(tool.start_pos.y - tool.end_pos.y);
+  };
+  if (tool.name === "marquee" && tool.start_pos !== null && tool.end_pos !== null) {
+    // ctx.putImageData(tool.buffered_image, tool.start_pos.x, tool.start_pos.y);
+    if (mouse.down)
+      if (mouse_inside_marquee())
+        if (mouse.update) {
+          let diff_x = (mouse.old_x - mouse.x);
+          let diff_y = (mouse.old_y - mouse.y);
+          tool.start_pos.x -= diff_x;
+          tool.start_pos.y -= diff_y;
+          tool.end_pos.x -= diff_x;
+          tool.end_pos.y -= diff_y;
+        } else { }
+      else {
+        drawing_ctx.putImageData(tool.buffered_image, tool.start_pos.x, tool.start_pos.y);
+        tool.start_pos = null;
+        tool.end_pos = null;
+        mouse.down = false;
+        return;
+      }
+    ctx.putImageData(tool.buffered_image, tool.start_pos.x, tool.start_pos.y);
+    ctx.setLineDash([4]);
+    ctx.strokeRect(
+      tool.start_pos.x, tool.start_pos.y,
+      tool.end_pos.x - tool.start_pos.x, tool.end_pos.y - tool.start_pos.y
+    );
+    ctx.setLineDash([]);
+  }
+};
 
 let color_picker = new ColorPicker();
 const render = () => {
@@ -272,6 +334,7 @@ const render = () => {
   }
   translate(-5, -50);
 
+
   translate(20, 350);
   brush_size_slider.render();
   translate(-20, -350);
@@ -281,6 +344,8 @@ const render = () => {
   translate(20, 500);
   color_slider.render();
   translate(-20, -500);
+
+  render_marquee();
 
   if (mouse.x > 160)
     render_preview();

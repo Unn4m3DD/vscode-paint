@@ -6,6 +6,8 @@ let tool: Tool = {
   stroke_color: "#000",
   stroke_size: 10,
   start_pos: null,
+  end_pos: null,
+  buffered_marquee: null;
   base_color: [1, 0, 0, 1]
 };
 let translation: { x: number, y: number } = { x: 20, y: 0 };

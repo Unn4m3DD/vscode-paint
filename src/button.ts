@@ -28,7 +28,6 @@ class Button {
   }
 }
 
-/* eslint-disable @typescript-eslint/naming-convention */
 class Slider {
   current_x: number;
   selected: boolean;
