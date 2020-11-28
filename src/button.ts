@@ -91,7 +91,6 @@ class ColorPicker {
       if (mouse.down) {
         let { x, y } = ({ x: mouse.x - 20, y: mouse.y });
         let color = ctx.getImageData(x, y, 1, 1).data;
-        console.log({ x, y, color });
         tool.fill_color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1)`;
         tool.stroke_color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1)`;
       }

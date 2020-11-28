@@ -1,3 +1,4 @@
+
 /* eslint-disable @typescript-eslint/naming-convention */
 ctx.fillStyle = "#000";
 ctx.strokeStyle = "#000";
@@ -46,7 +47,7 @@ let buttons = [
   }, () => { tool.name = "line"; }),
   new Button(() => {
     ctx.drawImage(bucket, 0, 0, bucket.width, bucket.height, -16, -16, 35, 35);
-  }, () => { }),
+  }, () => { tool.name = "bucket"; }),
 ];
 
 let brush_size_slider = new Slider(() => {
@@ -275,9 +276,86 @@ function render_preview() {
     ctx.closePath();
     ctx.fill();
   }
+
+  if (tool.name === "bucket" && mouse.down) {
+    start();
+    let target_color = tool.fill_color.replace("rgba(", "").replace(")", "").split(",").map((e) => Number(e));
+    target_color[3] = 255;
+    floodFill(mouse.x, mouse.y, target_color);
+
+    function getPixel(image_data: ImageData, x: number, y: number) {
+      if (x < 0 || y < 0 || x >= image_data.width || y >= image_data.height) {
+        return [-1, -1, -1, -1];  // impossible color
+      } else {
+        const offset = (y * image_data.width + x) * 4;
+        return image_data.data.slice(offset, offset + 4);
+      }
+    }
+
+    function setPixel(image_data: ImageData, x: number, y: number, color: number[]) {
+      const offset = (y * image_data.width + x) * 4;
+      image_data.data[offset + 0] = color[0];
+      image_data.data[offset + 1] = color[1];
+      image_data.data[offset + 2] = color[2];
+      image_data.data[offset + 3] = color[0];
+    }
+
+    function colorsMatch(a: number[] | Uint8ClampedArray, b: number[] | Uint8ClampedArray) {
+      return a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3];
+    }
+
+    function floodFill(x: number, y: number, fillColor: number[]) {
+      // read the pixels in the canvas
+      const image_data = drawing_ctx.getImageData(0, 0, drawing_ctx.canvas.width, drawing_ctx.canvas.height);
+
+      // get the color we're filling
+      const targetColor = getPixel(image_data, x, y);
+
+      // check we are actually filling a different color
+      if (!colorsMatch(targetColor, fillColor)) {
+
+        const pixelsToCheck = [x, y];
+        while (pixelsToCheck.length > 0) {
+          const y = pixelsToCheck.pop()!!;
+          const x = pixelsToCheck.pop()!!;
+
+          const currentColor = getPixel(image_data, x, y);
+          if (colorsMatch(currentColor, targetColor)) {
+            setPixel(image_data, x, y, fillColor);
+            pixelsToCheck.push(x + 1, y);
+            pixelsToCheck.push(x - 1, y);
+            pixelsToCheck.push(x, y + 1);
+            pixelsToCheck.push(x, y - 1);
+          }
+        }
+
+        // put the data back
+        drawing_ctx.putImageData(image_data, 0, 0);
+      }
+    }
+
+
+    end();
+  }
+
   ctx.restore();
 }
+var startTime: any, endTime: any;
 
+function start() {
+  startTime = new Date();
+};
+
+function end() {
+  endTime = new Date();
+  var timeDiff = endTime - startTime; //in ms
+  // strip the ms
+  timeDiff /= 1000;
+
+  // get seconds 
+  var seconds = Math.round(timeDiff);
+  console.log(seconds + " seconds");
+}
 function render_marquee() {
   let mouse_inside_marquee = () => {
     if (tool.start_pos === null || tool.end_pos === null)
@@ -300,13 +378,13 @@ function render_marquee() {
           tool.end_pos.y -= diff_y;
         } else { }
       else {
-        drawing_ctx.putImageData(tool.buffered_image, tool.start_pos.x, tool.start_pos.y);
+        drawing_ctx.putImageData(tool.buffered_image!!, tool.start_pos.x, tool.start_pos.y);
         tool.start_pos = null;
         tool.end_pos = null;
         mouse.down = false;
         return;
       }
-    ctx.putImageData(tool.buffered_image, tool.start_pos.x, tool.start_pos.y);
+    ctx.putImageData(tool.buffered_image!!, tool.start_pos.x, tool.start_pos.y);
     ctx.setLineDash([4]);
     ctx.strokeRect(
       tool.start_pos.x, tool.start_pos.y,

@@ -2,12 +2,12 @@
 declare var res_path: string;
 let tool: Tool = {
   name: "none",
-  fill_color: "#000",
-  stroke_color: "#000",
+  fill_color: "rgba(0, 0, 0, 1)",
+  stroke_color: "rgba(0, 0, 0, 1)",
   stroke_size: 10,
   start_pos: null,
   end_pos: null,
-  buffered_marquee: null;
+  buffered_image: null,
   base_color: [1, 0, 0, 1]
 };
 let translation: { x: number, y: number } = { x: 20, y: 0 };
