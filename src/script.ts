@@ -272,7 +272,7 @@ function render_preview() {
   }
   if (tool.name === "brush" || tool.name === "eraser") {
     ctx.beginPath();
-    ctx.arc(mouse.x, mouse.y, tool.stroke_size / 2, 0, Math.PI * 2);
+    ctx.arc(mouse.x - 20, mouse.y, tool.stroke_size / 2, 0, Math.PI * 2);
     ctx.closePath();
     ctx.fill();
   }
