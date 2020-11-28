@@ -6,6 +6,7 @@ export function activate(context: vscode.ExtensionContext) {
   let disposable = vscode.commands.registerCommand('vscode-paint.open', () => {
     let view = vscode.window.createWebviewPanel("VSCode Paint", "paint", vscode.ViewColumn.One, {
       enableScripts: true,
+      retainContextWhenHidden: true
     });
     view.webview.html = getWebviewContent([
       vscode.Uri.file(path.join(context.extensionPath, 'out', 'setup.js')).fsPath,
