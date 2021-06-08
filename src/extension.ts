@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(disposable);
 }
-function getWebviewContent(uris: string[]) {
+export function  getWebviewContent(uris: string[]) {
   let js = "";
   for (let uri of uris) {
     js += "\n" + fs.readFileSync(uri).toString();
@@ -40,5 +40,6 @@ function getWebviewContent(uris: string[]) {
 <script> ${js} </script>
 </html>`;
 }
+
 // this method is called when your extension is deactivated
 export function deactivate() { }

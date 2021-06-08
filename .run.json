@@ -1,0 +1,7 @@
+{
+  "setup": "sudo docker build . -t vscode-paint-web",
+  "run": "&& sudo docker run -p $PORT:5000 vscode-paint-web ",
+  "title": "vscode-paint",
+  "subtitle": "Web Version of vscode-paint",
+  "video": "https://raw.githubusercontent.com/Unn4m3DD/microsite-pei/master/demo.mp4"
+}
